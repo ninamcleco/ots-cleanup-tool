@@ -5,7 +5,7 @@ import io
 
 # Set the page configuration for a professional title
 st.set_page_config(
-    page_title="Shopify Inventory Converter",
+    page_title="Shopify Inventory Converter For NM",
     layout="centered"
 )
 
@@ -17,6 +17,16 @@ def convert_to_shopify_format(df):
     # Identify size columns and OTS inventory columns
     size_cols = [f'Size {i}' for i in range(1, 9)]
     ots_cols = [f'ots{i}' for i in range(1, 9)]
+
+    # === PROTECTIVE CLEANING ADDED HERE ===
+    # 1. Clean the Style major (Handle) and Color/Options data before melting
+    df['Style major'] = df['Style major'].astype(str).str.strip()
+    df['Color'] = df['Color'].astype(str).str.strip()
+    
+    # Clean the Size option columns
+    for col in [c for c in size_cols if c in df.columns]:
+        df[col] = df[col].astype(str).str.strip()
+    # ======================================
 
     # Select core columns and handle missing columns gracefully
     df_core = df[['Style major', 'Color'] + [col for col in size_cols if col in df.columns] + [col for col in ots_cols if col in df.columns]].copy()
@@ -73,7 +83,7 @@ def convert_to_shopify_format(df):
 
 # --- STREAMLIT GUI INTERFACE ---
 
-st.title("🛍️ Shopify Inventory Converter")
+st.title("🛍️ Shopify Inventory Converter For NM")
 st.markdown("Upload your raw, wide-format master CSV file. The tool will convert it to the Shopify-compatible variant format, filtering for positive inventory, and provide a clean CSV download.")
 
 uploaded_file = st.file_uploader(
